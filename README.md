@@ -72,7 +72,16 @@ By completing this course, I will learn how to:
 * **Module 10:** Laravel Framework
 
 ## 📂 Repository Structure
+
+```text
 PHP_Practice_Concepts/
+│
+├── weak1/
+│   ├── Screen_Shot/
+│   │   ├── PHP_Echo_Print_Code.png
+│   │   ├── PHP_Tags.png
+│   │   └── README.md
+│   ├── home.php
 │
 ├── Module-01/
 │   ├── introduction/
@@ -120,6 +129,7 @@ PHP_Practice_Concepts/
 │   └── laravel/
 │
 └── README.md
+```
 
 ## 📝 Assessment
 
