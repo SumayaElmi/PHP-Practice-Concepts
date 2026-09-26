@@ -123,7 +123,7 @@ echo "</pre>";
 // 5. Creates an indexed array with personal information.
 $info = array(
     "101",
-    "Upah omar alasow",
+    "sumaya elmi",
     20,
     "Karan District",
     "single"
