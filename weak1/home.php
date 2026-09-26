@@ -17,10 +17,10 @@
         echo "sumaya", "elmi <br>";
 
         // Disabled print code with multiple parameters (syntax error example)
-        // print "ca233","semert7";
+        //    print "ca233","semert7";
 
         // Disabled nested echo code example
-        // echo ( echo "sumaya","elmi") ;
+        //    echo ( echo "sumaya","elmi") ;
 
         // Variables and Output
         $fullname = "zuu , elmi";
@@ -29,7 +29,12 @@
                 // Using built-in function to count words
         $my_str = "welcome to php";
         echo "tirada string waa ", str_word_count($my_str), "<br>";
-    ?>
 
+
+?>
+
+
+                   
+  
 </body>
 </html>
