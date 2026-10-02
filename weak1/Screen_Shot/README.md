@@ -85,6 +85,7 @@ Note: Parentheses are optional for both:
 
 echo "welcome to php";
 print "welcome to php";
+
 or
 
 echo ("welcome to php");

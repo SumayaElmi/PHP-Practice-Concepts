@@ -126,6 +126,7 @@ echo "<br><br><br>";
     <tr>
         <th>ID</th>
         <th>Name</th>
+
     </tr>
     <?php
     $names = ["Sumaya", "Amina", "Farhiya", "Khadija", "Hinda"];
@@ -133,5 +134,6 @@ echo "<br><br><br>";
     for ($i = 0; $i < count($names); $i++) {
         echo "<tr><td>" . ($i + 1) . "</td><td>" . $names[$i] . "</td></tr>";
     }
+      
     ?>
 </table>
