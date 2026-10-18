@@ -22,7 +22,7 @@ foreach ($info as $list) {
  
 $info = array(
     array(10, 28, "CA233", 98.12),
-    array("123", " Qali Abdullahi Hassan", "CA2313", 98.12)
+    array("123", "zuu elmi", "CA2313", 98.12)
 );
  
 foreach ($info as $list) {
