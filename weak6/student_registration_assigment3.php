@@ -63,17 +63,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $errors["gender"] = "Please select a valid gender.";
     }
 
-    if ($dob !== "" && strtotime($dob) === false) {
-        $errors["dob"] = "Please enter a valid date of birth.";
+    if ($dob !== "") {
+        $date = DateTime::createFromFormat("Y-m-d", $dob);
+        if (!$date || $date->format("Y-m-d") !== $dob) {
+            $errors["dob"] = "Please enter a valid date of birth.";
+        }
     }
 
-    if ($reg_date !== "" && strtotime($reg_date) === false) {
-        $errors["reg_date"] = "Please enter a valid registration date.";
+    if ($reg_date !== "") {
+        $date = DateTime::createFromFormat("Y-m-d", $reg_date);
+        if (!$date || $date->format("Y-m-d") !== $reg_date) {
+            $errors["reg_date"] = "Please enter a valid registration date.";
+        }
     }
 
     // Validate uploaded image
     $imageName = "";
     $image = $_FILES["image"] ?? null;
+    $allowedTypes = [
+        "image/png" => "png",
+        "image/jpeg" => "jpg",
+        "image/gif" => "gif"
+    ];
 
     if (!$image || $image["error"] === UPLOAD_ERR_NO_FILE) {
         $errors["image"] = "Please upload an image.";
@@ -82,12 +93,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif ($image["size"] > 2 * 1024 * 1024) {
         $errors["image"] = "Image size must not exceed 2 MB.";
     } else {
-        $allowedTypes = [
-            "image/png" => "png",
-            "image/jpeg" => "jpg",
-            "image/gif" => "gif"
-        ];
-
         $imageInfo = @getimagesize($image["tmp_name"]);
         $mimeType = $imageInfo["mime"] ?? "";
 
@@ -105,15 +110,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 
-    // Save the image and student information
+    // Save image and student information
     if (!$hasError) {
         $uploadDirectory = __DIR__ . "/uploads/";
 
-        if (!is_dir($uploadDirectory)) {
-            if (!mkdir($uploadDirectory, 0755, true)) {
-                $errors["image"] = "Could not create the uploads folder.";
-                $hasError = true;
-            }
+        if (!is_dir($uploadDirectory) &&
+            !mkdir($uploadDirectory, 0755, true)) {
+            $errors["image"] = "Could not create the uploads folder.";
+            $hasError = true;
         }
 
         if (!$hasError && !is_writable($uploadDirectory)) {
@@ -134,7 +138,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $student["image"] = $imageName;
                 $_SESSION["student"] = $student;
 
-                header("Location: result.php");
+                // Redirect to the correctly named result file
+                header("Location: student_registration_result_assigment3.php");
                 exit;
             } else {
                 $errors["image"] = "Could not save the image. Please try again.";
@@ -144,6 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -163,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     <?php endif; ?>
 
-    <form method="post" action="index.php" enctype="multipart/form-data">
+    <form method="post" action="student_registration_assigment3.php" enctype="multipart/form-data">
 
         <input type="hidden" name="MAX_FILE_SIZE" value="2097152">
 
@@ -173,19 +179,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <div class="col-md-6">
                     <label class="form-label">Name</label>
-                    <input type="text" name="name" class="form-control <?= $errors['name'] ? 'is-invalid' : '' ?>" value="<?= e($name) ?>">
+                    <input type="text" name="name" required
+                           class="form-control <?= $errors['name'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($name) ?>">
                     <div class="invalid-feedback"><?= e($errors["name"]) ?></div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Place of Birth (POB)</label>
-                    <input type="text" name="pob" class="form-control <?= $errors['pob'] ? 'is-invalid' : '' ?>" value="<?= e($pob) ?>">
+                    <input type="text" name="pob" required
+                           class="form-control <?= $errors['pob'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($pob) ?>">
                     <div class="invalid-feedback"><?= e($errors["pob"]) ?></div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Date of Birth (DOB)</label>
-                    <input type="date" name="dob" class="form-control <?= $errors['dob'] ? 'is-invalid' : '' ?>" value="<?= e($dob) ?>">
+                    <input type="date" name="dob" required
+                           class="form-control <?= $errors['dob'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($dob) ?>">
                     <div class="invalid-feedback"><?= e($errors["dob"]) ?></div>
                 </div>
 
@@ -193,12 +205,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <label class="form-label d-block">Gender</label>
 
                     <div class="form-check form-check-inline">
-                        <input type="radio" name="gender" value="Male" class="form-check-input" <?= $gender === "Male" ? "checked" : "" ?>>
+                        <input type="radio" name="gender" value="Male"
+                               class="form-check-input" required
+                               <?= $gender === "Male" ? "checked" : "" ?>>
                         <label class="form-check-label">Male</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input type="radio" name="gender" value="Female" class="form-check-input" <?= $gender === "Female" ? "checked" : "" ?>>
+                        <input type="radio" name="gender" value="Female"
+                               class="form-check-input"
+                               <?= $gender === "Female" ? "checked" : "" ?>>
                         <label class="form-check-label">Female</label>
                     </div>
 
@@ -207,28 +223,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <div class="col-12">
                     <label class="form-label">Address</label>
-                    <input type="text" name="address" class="form-control <?= $errors['address'] ? 'is-invalid' : '' ?>" value="<?= e($address) ?>">
+                    <input type="text" name="address" required
+                           class="form-control <?= $errors['address'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($address) ?>">
                     <div class="invalid-feedback"><?= e($errors["address"]) ?></div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Telephone</label>
-                    <input type="text" name="telephone" class="form-control <?= $errors['telephone'] ? 'is-invalid' : '' ?>" value="<?= e($telephone) ?>">
+                    <input type="text" name="telephone" required
+                           class="form-control <?= $errors['telephone'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($telephone) ?>">
                     <div class="invalid-feedback"><?= e($errors["telephone"]) ?></div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control <?= $errors['email'] ? 'is-invalid' : '' ?>" value="<?= e($email) ?>">
+                    <input type="email" name="email" required
+                           class="form-control <?= $errors['email'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($email) ?>">
                     <div class="invalid-feedback"><?= e($errors["email"]) ?></div>
                 </div>
 
                 <div class="col-12">
                     <label class="form-label">Student Image (PNG, JPG, GIF — max 2 MB)</label>
-                    <input type="file" name="image" accept="image/png,image/jpeg,image/gif" class="form-control <?= $errors['image'] ? 'is-invalid' : '' ?>">
+                    <input type="file" name="image" required
+                           accept="image/png,image/jpeg,image/gif"
+                           class="form-control <?= $errors['image'] ? 'is-invalid' : '' ?>">
                     <div class="invalid-feedback"><?= e($errors["image"]) ?></div>
                 </div>
-
             </div>
         </div>
 
@@ -238,29 +261,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <div class="col-md-4">
                     <label class="form-label">Parent Name</label>
-                    <input type="text" name="parent_name" class="form-control <?= $errors['parent_name'] ? 'is-invalid' : '' ?>" value="<?= e($parent_name) ?>">
+                    <input type="text" name="parent_name" required
+                           class="form-control <?= $errors['parent_name'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($parent_name) ?>">
                     <div class="invalid-feedback"><?= e($errors["parent_name"]) ?></div>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Parent Telephone</label>
-                    <input type="text" name="parent_phone" class="form-control <?= $errors['parent_phone'] ? 'is-invalid' : '' ?>" value="<?= e($parent_phone) ?>">
+                    <input type="text" name="parent_phone" required
+                           class="form-control <?= $errors['parent_phone'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($parent_phone) ?>">
                     <div class="invalid-feedback"><?= e($errors["parent_phone"]) ?></div>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Relationship</label>
-                    <select name="relationship" class="form-select <?= $errors['relationship'] ? 'is-invalid' : '' ?>">
+                    <select name="relationship" required
+                            class="form-select <?= $errors['relationship'] ? 'is-invalid' : '' ?>">
                         <option value="">-- Select --</option>
                         <?php foreach (["Father", "Mother", "Brother", "Sister", "Uncle", "Guardian"] as $option): ?>
-                            <option value="<?= e($option) ?>" <?= $relationship === $option ? "selected" : "" ?>>
+                            <option value="<?= e($option) ?>"
+                                <?= $relationship === $option ? "selected" : "" ?>>
                                 <?= e($option) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                     <div class="invalid-feedback"><?= e($errors["relationship"]) ?></div>
                 </div>
-
             </div>
         </div>
 
@@ -270,16 +298,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <div class="col-md-4">
                     <label class="form-label">Student ID</label>
-                    <input type="text" name="student_id" class="form-control <?= $errors['student_id'] ? 'is-invalid' : '' ?>" value="<?= e($student_id) ?>">
+                    <input type="text" name="student_id" required
+                           class="form-control <?= $errors['student_id'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($student_id) ?>">
                     <div class="invalid-feedback"><?= e($errors["student_id"]) ?></div>
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Faculty</label>
-                    <select name="faculty" class="form-select <?= $errors['faculty'] ? 'is-invalid' : '' ?>">
+                    <select name="faculty" required
+                            class="form-select <?= $errors['faculty'] ? 'is-invalid' : '' ?>">
                         <option value="">-- Select --</option>
                         <?php foreach (["Computer and IT", "Engineering", "Business", "Law", "Medicine"] as $option): ?>
-                            <option value="<?= e($option) ?>" <?= $faculty === $option ? "selected" : "" ?>>
+                            <option value="<?= e($option) ?>"
+                                <?= $faculty === $option ? "selected" : "" ?>>
                                 <?= e($option) ?>
                             </option>
                         <?php endforeach; ?>
@@ -289,31 +321,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 <div class="col-md-4">
                     <label class="form-label">Department</label>
-                    <input type="text" name="department" class="form-control <?= $errors['department'] ? 'is-invalid' : '' ?>" value="<?= e($department) ?>">
+                    <input type="text" name="department" required
+                           class="form-control <?= $errors['department'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($department) ?>">
                     <div class="invalid-feedback"><?= e($errors["department"]) ?></div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Class</label>
-                    <input type="text" name="class" class="form-control <?= $errors['class'] ? 'is-invalid' : '' ?>" value="<?= e($class) ?>">
+                    <input type="text" name="class" required
+                           class="form-control <?= $errors['class'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($class) ?>">
                     <div class="invalid-feedback"><?= e($errors["class"]) ?></div>
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Registration Date</label>
-                    <input type="date" name="reg_date" class="form-control <?= $errors['reg_date'] ? 'is-invalid' : '' ?>" value="<?= e($reg_date) ?>">
+                    <input type="date" name="reg_date" required
+                           class="form-control <?= $errors['reg_date'] ? 'is-invalid' : '' ?>"
+                           value="<?= e($reg_date) ?>">
                     <div class="invalid-feedback"><?= e($errors["reg_date"]) ?></div>
                 </div>
-
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-lg w-100">Register Student</button>
+        <button type="submit" class="btn btn-primary btn-lg w-100">
+            Register Student
+        </button>
     </form>
 </div>
 
 <script>
     const firstError = document.querySelector(".is-invalid");
+
     if (firstError) {
         firstError.scrollIntoView({ behavior: "smooth", block: "center" });
         firstError.focus();

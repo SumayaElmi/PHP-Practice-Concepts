@@ -2,7 +2,7 @@
 <?php
 session_start();
 
-// Redirect visitors who have not submitted the form.
+// Redirect to the registration form if no student data exists
 if (!isset($_SESSION["student"])) {
     header("Location: student_registration_assigment3.php");
     exit;
@@ -10,212 +10,252 @@ if (!isset($_SESSION["student"])) {
 
 $student = $_SESSION["student"];
 
-// Escape values before displaying them.
+// Safely display student information
 function e($value) {
-    return htmlspecialchars((string)$value, ENT_QUOTES, "UTF-8");
-}
-
-// Retrieve student information safely.
-$fullname = $student["fullname"] ?? "";
-$email = $student["email"] ?? "";
-$phone = $student["phone"] ?? "";
-$gender = $student["gender"] ?? "";
-$dob = $student["dob"] ?? "";
-$address = $student["address"] ?? "";
-$faculty = $student["faculty"] ?? "";
-$department = $student["department"] ?? "";
-$course = $student["course"] ?? "";
-$year = $student["year"] ?? "";
-$hobbies = $student["hobbies"] ?? [];
-$bio = $student["bio"] ?? "";
-$image = basename($student["image"] ?? "");
-
-if (!is_array($hobbies)) {
-    $hobbies = [];
-}
-
-// Locate the uploaded image in the Downloads/move files folder.
-$uploadDir = "C:/Users/HP/Downloads/move files/";
-$imagePath = $uploadDir . $image;
-
-$imageExists = (
-    $image !== "" &&
-    is_file($imagePath) &&
-    getimagesize($imagePath) !== false
-);
-
-// Convert the image to Base64 so it can be displayed
-// without needing a separate student_image.php file.
-$imageData = "";
-
-if ($imageExists) {
-    $imageInfo = getimagesize($imagePath);
-    $mimeType = $imageInfo["mime"] ?? "";
-
-    $allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp"
-    ];
-
-    if (in_array($mimeType, $allowedTypes, true)) {
-        $imageData = "data:" . $mimeType . ";base64," .
-            base64_encode(file_get_contents($imagePath));
-    } else {
-        $imageExists = false;
-    }
+    return htmlspecialchars((string)($value ?? ""), ENT_QUOTES, "UTF-8");
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Student Registration Result</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
+        body {
+            background: #f1f5f9;
+        }
+
+        .result-container {
+            max-width: 900px;
+            margin: 35px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        .student-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #0d6efd;
+        }
+
+        .section-title {
+            background: #0d6efd;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 25px 0 15px;
+        }
+
+        .detail-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 13px;
+            height: 100%;
+            overflow-wrap: anywhere;
+        }
+
+        .detail-label {
+            display: block;
+            font-weight: bold;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #111827;
+        }
+
         @media print {
             .no-print {
                 display: none !important;
             }
 
-            body {
-                background: white !important;
-            }
-
-            .card {
-                box-shadow: none !important;
-                border: none !important;
+            .result-container {
+                box-shadow: none;
+                margin: 0 auto;
             }
         }
     </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container py-5">
-    <div class="card shadow mx-auto" style="max-width: 900px;">
+<div class="container result-container">
 
-        <div class="card-header bg-success text-white text-center py-4">
-            <h2>Student Registration Successful</h2>
-            <p class="mb-0">Student information is shown below.</p>
+    <h1 class="text-center text-primary mb-3">
+        Student Registration Result
+    </h1>
+
+    <div class="alert alert-success text-center">
+        <strong>Registration Successful!</strong>
+        Student information has been submitted successfully.
+    </div>
+
+    <div class="text-center mb-4">
+        <?php
+        $imagePath = __DIR__ . "/uploads/" . basename($student["image"] ?? "");
+        $imageUrl = "uploads/" . rawurlencode(basename($student["image"] ?? ""));
+        ?>
+
+        <?php if (!empty($student["image"]) && is_file($imagePath)): ?>
+            <img
+                src="<?= e($imageUrl) ?>"
+                alt="Student Image"
+                class="student-image"
+            >
+        <?php else: ?>
+            <p class="text-danger">Student image is unavailable.</p>
+        <?php endif; ?>
+
+        <h4 class="mt-3"><?= e($student["name"] ?? "") ?></h4>
+        <p class="text-muted">
+            Student ID: <?= e($student["student_id"] ?? "") ?>
+        </p>
+    </div>
+
+    <h4 class="section-title">Personal Information</h4>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Student Name</span>
+                <span class="detail-value"><?= e($student["name"] ?? "") ?></span>
+            </div>
         </div>
 
-        <div class="card-body p-4">
-
-            <div class="text-center mb-4">
-                <?php if ($imageData !== ""): ?>
-                    <img
-                        src="<?= e($imageData) ?>"
-                        alt="Student Image"
-                        class="img-thumbnail rounded"
-                        style="width: 160px; height: 160px; object-fit: cover;">
-                <?php else: ?>
-                    <p class="text-danger">
-                        Student image could not be found.
-                    </p>
-                <?php endif; ?>
-
-                <h3 class="mt-3"><?= e($fullname) ?></h3>
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Place of Birth</span>
+                <span class="detail-value"><?= e($student["pob"] ?? "") ?></span>
             </div>
+        </div>
 
-            <h4 class="text-primary mb-3">Student Information</h4>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
-                    <tbody>
-                        <tr>
-                            <th style="width: 35%;">Full Name</th>
-                            <td><?= e($fullname) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Email Address</th>
-                            <td><?= e($email) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Phone Number</th>
-                            <td><?= e($phone) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Gender</th>
-                            <td><?= e($gender) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Date of Birth</th>
-                            <td><?= e($dob) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Address</th>
-                            <td><?= nl2br(e($address)) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Faculty</th>
-                            <td><?= e($faculty) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Department</th>
-                            <td><?= e($department) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Course / Program</th>
-                            <td><?= e($course) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Year of Study</th>
-                            <td><?= e($year) ?></td>
-                        </tr>
-
-                        <tr>
-                            <th>Hobbies</th>
-                            <td>
-                                <?= !empty($hobbies)
-                                    ? e(implode(", ", $hobbies))
-                                    : "Not specified" ?>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th>Short Biography</th>
-                            <td>
-                                <?= $bio !== ""
-                                    ? nl2br(e($bio))
-                                    : "Not provided" ?>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Date of Birth</span>
+                <span class="detail-value"><?= e($student["dob"] ?? "") ?></span>
             </div>
+        </div>
 
-            <div class="d-flex flex-wrap gap-2 mt-4 no-print">
-                <a href="student_registration_assigment3.php?new=1"
-                   class="btn btn-primary">
-                    Register Another Student
-                </a>
-
-                <button type="button"
-                        onclick="window.print()"
-                        class="btn btn-outline-secondary">
-                    Print Result
-                </button>
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value"><?= e($student["gender"] ?? "") ?></span>
             </div>
+        </div>
 
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Address</span>
+                <span class="detail-value"><?= e($student["address"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Telephone</span>
+                <span class="detail-value"><?= e($student["telephone"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Email</span>
+                <span class="detail-value"><?= e($student["email"] ?? "") ?></span>
+            </div>
         </div>
     </div>
+
+    <h4 class="section-title">Parent Information</h4>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="detail-box">
+                <span class="detail-label">Parent Name</span>
+                <span class="detail-value"><?= e($student["parent_name"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="detail-box">
+                <span class="detail-label">Parent Telephone</span>
+                <span class="detail-value"><?= e($student["parent_phone"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="detail-box">
+                <span class="detail-label">Relationship</span>
+                <span class="detail-value"><?= e($student["relationship"] ?? "") ?></span>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="section-title">Academic Information</h4>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Student ID</span>
+                <span class="detail-value"><?= e($student["student_id"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Faculty</span>
+                <span class="detail-value"><?= e($student["faculty"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Department</span>
+                <span class="detail-value"><?= e($student["department"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Class</span>
+                <span class="detail-value"><?= e($student["class"] ?? "") ?></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="detail-box">
+                <span class="detail-label">Registration Date</span>
+                <span class="detail-value"><?= e($student["reg_date"] ?? "") ?></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4 no-print">
+        <a
+            href="student_registration_assigment3.php?new=1"
+            class="btn btn-primary flex-fill"
+        >
+            Register Another Student
+        </a>
+
+        <button
+            type="button"
+            onclick="window.print()"
+            class="btn btn-secondary flex-fill"
+        >
+            Print Result
+        </button>
+    </div>
+
 </div>
 
 </body>
