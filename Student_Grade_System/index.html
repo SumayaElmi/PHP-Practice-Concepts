@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Grade Management System</title>
+</head>
+<body>
+
+    <h2>Student Grade Management System</h2>
+
+    <form action="process.php" method="POST"
+          enctype="multipart/form-data">
+
+    
+        <input type="text" name="student_name">
+        <br><br>
+
+        Student ID:
+        <input type="text" name="student_id">
+        <br><br>
+
+      
+        <input type="radio" name="gender" value="Male"> Male
+        <input type="radio" name="gender" value="Female"> Female
+        <br><br>
+
+     
+        <select name="faculty">
+            <option value="">Select Faculty</option>
+            <option value="IT">Information Technology</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Business">Business</option>
+            <option value="Engineering">Engineering</option>
+        </select>
+        <br><br>
+
+     
+        <input type="number" name="php_mark" min="0" max="100" step="any">
+        <br><br>
+
+        <input type="number" name="database_mark" min="0" max="100" step="any">
+        <br><br>
+
+      
+        <input type="number" name="networking_mark" min="0" max="100" step="any">
+        <br><br>
+
+    
+        <input type="file" name="certificate">
+        <br><br>
+
+        <button type="submit">Submit and Calculate</button>
+        <button type="reset">Reset</button>
+
+    </form>
+
+</body>
+</html>
