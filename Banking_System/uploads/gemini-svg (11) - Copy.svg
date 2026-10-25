@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#E52E2E" stroke-width="2">
+  <!-- Globe Center -->
+  <circle cx="12" cy="12" r="7"></circle>
+  <line x1="5" y1="12" x2="19" y2="12"></line>
+  <path d="M12 5a10 10 0 0 0 0 14a10 10 0 0 0 0-14"></path>
+  <!-- Surrounding Nodes -->
+  <circle cx="5" cy="5" r="1.5" fill="#E52E2E"></circle>
+  <circle cx="19" cy="5" r="1.5" fill="#E52E2E"></circle>
+  <circle cx="5" cy="19" r="1.5" fill="#E52E2E"></circle>
+  <circle cx="19" cy="19" r="1.5" fill="#E52E2E"></circle>
+</svg>

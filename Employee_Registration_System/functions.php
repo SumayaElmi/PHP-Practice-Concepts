@@ -32,7 +32,11 @@ function checkSalaryStatus($netSalary)
         return "High Salary";
     } elseif ($netSalary >= 800) {
         return "Medium Salary";
-    } else {
+    } else { 
+        yes may name is sumaya elmi farax i wamt to tak about assigment avout html css and php 
+        i need to help this assigmnet 
+        ka shaqe asisgment adigo ka dhigayo biggener friendly sida 2dii hore 
+        marka hore samee structure folder kadib file walba  code kiisa isii raac instruction asosgmen4
         return "Low Salary";
     }
 }
