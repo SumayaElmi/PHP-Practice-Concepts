@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Banking Account System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f2f2f2;
+        }
+
+        form {
+            width: 400px;
+            margin: auto;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid gray;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Banking Account Form</h2>
+
+    <form action="process.php" method="POST"
+          enctype="multipart/form-data">
+
+        <label>Customer Full Name:</label>
+        <input type="text" name="customer_name">
+        <br><br>
+
+        <label>Account Number:</label>
+        <input type="text" name="account_number">
+        <br><br>
+
+        <label>Gender:</label>
+        <input type="radio" name="gender" value="Male"> Male
+        <input type="radio" name="gender" value="Female"> Female
+        <br><br>
+
+        <label>Account Type:</label>
+        <select name="account_type">
+            <option value="">Select Account Type</option>
+            <option value="Savings">Savings</option>
+            <option value="Current">Current</option>
+            <option value="Business">Business</option>
+        </select>
+        <br><br>
+
+        <label>Opening Balance:</label>
+        <input type="number" name="opening_balance" min="0" step="any">
+        <br><br>
+
+        <label>Transaction Type:</label>
+        <input type="radio" name="transaction_type" value="Deposit">
+        Deposit
+
+        <input type="radio" name="transaction_type" value="Withdrawal">
+        Withdrawal
+        <br><br>
+
+        <label>Transaction Amount:</label>
+        <input type="number" name="transaction_amount" min="0" step="any">
+        <br><br>
+
+        <label>Account Duration (Years):</label>
+        <input type="number" name="account_duration" min="0" step="1">
+        <br><br>
+
+        <label>Identification Document:</label>
+        <input type="file" name="identification_document">
+        <br><br>
+
+        <button type="submit">Process Transaction</button>
+        <button type="reset">Reset</button>
+
+    </form>
+
+</body>
+</html>
