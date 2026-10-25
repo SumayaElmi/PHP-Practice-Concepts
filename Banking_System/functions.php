@@ -1,3 +1,4 @@
+
 <?php
 
 function calculateDeposit($openingBalance, $transactionAmount)
@@ -71,8 +72,7 @@ function checkAccountStatus($finalBalance)
     }
 }
 
-
-function calculateFutureBalance($finalBalance, $interest, $duration = 1)
+function calculateFutureBalance($finalBalance, $interest)
 {
     return $finalBalance + $interest;
 }
